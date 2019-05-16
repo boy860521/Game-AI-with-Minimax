@@ -14,3 +14,6 @@
 6. A player's move is skipped if he/she makes an invalid move or has no piece remaining on the board. The other player will continue to play.
 7. The game ends when Either player has all his/her pieces on the board in the target region, or A maximum of 200 moves per player has been played.
 8. At the end, the score of a player is the number of pieces placed in the target region. The player with the higher score wins the game.
+
+**Note**
+> This program is writen in C++11 and using Visual Studio 2017, so one might need to specify it when compiling this.  
