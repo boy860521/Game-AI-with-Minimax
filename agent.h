@@ -149,8 +149,8 @@ private:
 		}
 		return 0;
 	}
-	inline int win_or_lose() {
-		int n = 0, piecesDifference = int(pieces[0].size()) - int(pieces[1].size());
+	inline int win_or_lose(vector<Coordinate> &M, vector<Coordinate> &O) {
+		int n = 0, piecesDifference = int(M.size()) - int(O.size());
 		if (piecesDifference > 0) {
 			n = 100;
 		}
@@ -159,18 +159,18 @@ private:
 		}
 
 		for (int i = 0; ; i++) {
-			if (i == pieces[0].size()) {
+			if (i == M.size()) {
 				return n;
 			}
-			else if (pieces[0][i].x < 6) {
+			else if (M[i].x < 6) {
 				break;
 			}
 		}
 		for (int i = 0; ; i++) {
-			if (i == pieces[1].size()) {
+			if (i == O.size()) {
 				return n;
 			}
-			else if (pieces[1][i].x > 1) {
+			else if (O[i].x > 1) {
 				break;
 			}
 		}
@@ -326,11 +326,6 @@ private:
 		return 0;
 	}
 	void dig(int depth, int alpha) {
-		int WLCondition = win_or_lose();
-		if (WLCondition != 0) {
-			finalMovements.push_back(PathInfo{ vector<Coordinate>{},WLCondition });
-			return;
-		}
 		for (auto piece : pieces[0]) {
 			int fromX = piece.x, fromY = piece.y, hoppedInfo;
 
@@ -360,9 +355,7 @@ private:
 				}
 			}
 		}
-		if (depth == 0) {
-			return;
-		}
+		
 		// spread it
 		for (int i = 0; i < finalMovements.size(); i++) {
 			vector<Coordinate> myPieces = pieces[0], opponentPieces;
@@ -381,11 +374,15 @@ private:
 				}
 				opponentPieces.push_back(p);
 			}
-			Agent opp(opponentPieces, myPieces, !myColor);
-			opp.dig(depth - 1, alpha - finalMovements[i].value);
-			finalMovements[i].value -= opp.propagate_back();
-			if (alpha < finalMovements[i].value) {
-				alpha = finalMovements[i].value;
+
+			finalMovements[i].value += win_or_lose(myPieces, opponentPieces);
+			if (depth != 0) {
+				Agent opp(opponentPieces, myPieces, !myColor);
+				opp.dig(depth - 1, alpha - finalMovements[i].value);
+				finalMovements[i].value -= opp.propagate_back();
+				if (alpha < finalMovements[i].value) {
+					alpha = finalMovements[i].value;
+				}
 			}
 		}
 	}
